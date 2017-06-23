@@ -1,0 +1,15 @@
+{
+  "name": "freetimeback",
+  "version": "1.0.0",
+  "description": "",
+  "main": "example.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node example.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": "4.1.1"
+  }
+}

@@ -17,3 +17,12 @@
 - npm start
 
 ## Windows
+
+###pgAdmin4
+
+- Install windows installer from https://www.postgresql.org/download/windows/
+- User added in Login/Group roles
+- username:mahyar
+- password:bros123456
+- new server created:
+- name: localhost

@@ -21,16 +21,59 @@ const query = client.query(
     UNIQUE ("email"),
     UNIQUE ("phone_number")
   );
-  CREATE TABLE IF NOT EXISTS "friends" (
-      "id" integer,
-      "friend_id" integer,
-      PRIMARY KEY ("id"),
-      CONSTRAINT "account_id" FOREIGN KEY ("id") REFERENCES "account"("id") ON DELETE CASCADE ON UPDATE CASCADE,
-      CONSTRAINT "friend_id" FOREIGN KEY ("friend_id") REFERENCES "account"("id") ON DELETE CASCADE ON UPDATE CASCADE
-    );
+  `);
 
-`);
+  const query1 = client.query(
 
+  `CREATE TABLE IF NOT EXISTS "friend" (
+    "user_id" integer,
+    "friend_id" integer,
+    CONSTRAINT "user_id" FOREIGN KEY ("user_id") REFERENCES "account"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "friend_id" FOREIGN KEY ("friend_id") REFERENCES "account"("id") ON DELETE CASCADE ON UPDATE CASCADE
+  );
+  `);
 
+  const query2 = client.query(
+    `INSERT INTO "account"("id", "first_name", "last_name", "email", "deleted", "phone_number")
+    VALUES(0, 'Mehrad', 'Mohammadi', 'm3hrad@gmail.com', FALSE, '0505977458');
+  `);
 
-query.on('end', () => { client.end(); });
+  const query3 = client.query(`
+    INSERT INTO "account"("id", "first_name", "last_name", "email", "deleted", "phone_number")
+    VALUES(1, 'Mahyar', 'Mohammadi', 'mahyar@gmail.com', FALSE, '0417543124');
+  `);
+
+  const query4 = client.query(`
+    INSERT INTO "account"("id", "first_name", "last_name", "email", "deleted", "phone_number")
+    VALUES(2, 'Shima', 'Edalatkhah', 'shima@gmail.com', FALSE, '0449512964');
+  `);
+
+  const query5 = client.query(`
+    INSERT INTO "friend"("user_id", "friend_id") VALUES(0, 1);
+  `);
+
+  const query6 = client.query(`
+    INSERT INTO "friend"("user_id", "friend_id") VALUES(0, 2);
+  `);
+
+  query2.on('error', function(error) {
+    //  console.log(error);
+  });
+
+  query3.on('error', function(error) {
+    //  console.log(error);
+  });
+
+  query4.on('error', function(error) {
+    // console.log(error);
+  });
+
+  query5.on('error', function(error) {
+    // console.log(error);
+  });
+
+  query6.on('error', function(error) {
+    // console.log(error);
+  });
+
+query6.on('end', () => { client.end(); });

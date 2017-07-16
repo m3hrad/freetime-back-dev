@@ -6,16 +6,12 @@ var url = require('url')
 
 const pg = require('pg');
 var port = process.env.PORT || 3000;
-console.log('9');
-
 const connectionString = process.env.DATABASE_URL || 'postgres://freetime:freetime@localhost:5432/freetime';
 
-console.log('13');
 const client = new pg.Client(connectionString);
 
-console.log('16');
 client.connect();
-console.log('18');
+
 const query = client.query(
   `CREATE TABLE IF NOT EXISTS "account" (
     "id" serial ,
@@ -87,11 +83,9 @@ query5.on('error', function(error) {
 query6.on('error', function(error) {
   // console.log(error);
 });
-console.log('90');
 app.get('/', function(req, res) {
   res.send('OK');
 });
-console.log('94');
 
 app.get('/friends/:userId', function(req, res, next) {
 

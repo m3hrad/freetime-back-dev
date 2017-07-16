@@ -1,18 +1,18 @@
-var express = require('express')
+var express = require('express');
 
-var app = express()
-
-var url = require('url')
+var url = require('url');
 
 const pg = require('pg');
+
+var app = express();
 
 const connectionString = process.env.DATABASE_URL || 'postgres://freetime:freetime@localhost:5432/freetime';
 
 const client = new pg.Client(connectionString);
 
-
 client.connect();
 
+//prepare database
 const query = client.query(
   `CREATE TABLE IF NOT EXISTS "account" (
     "id" serial ,
@@ -85,7 +85,6 @@ query6.on('error', function(error) {
   // console.log(error);
 });
 
-
 app.get('/friends/:userId', function(req, res, next) {
 
   //check if the id exist
@@ -95,7 +94,7 @@ app.get('/friends/:userId', function(req, res, next) {
         console.log(err);
       }
       if (result) {
-        //if the id doesnt exists
+        //if the id doesn't exists
         if (typeof result.rows[0] == 'undefined') {
           //error handling
           var err = new Error();
@@ -105,31 +104,33 @@ app.get('/friends/:userId', function(req, res, next) {
 
         } else {
           const query7 = client.query(
-            `SELECT array_agg(friend_id) FROM friend WHERE user_id = $1::int group by user_id;`
+            `SELECT array_agg(friend_id) FROM friend WHERE user_id = $1::int;`
             ,[parseInt(req.params.userId)], function(err, result) {
 
             if (err) {
               throw err;
             }
             if (result) {
-              if (typeof result.rows[0] !== 'undefined' ) {
+              if (typeof result.rows[0] == 'undefined' ) {
+                res.json({friends: []});
+
+              } else {
                 var friendsIds = result.rows[0].array_agg;
                 var results = [];
-                var resultCount = 0;
+                var resultsCount = 0;
                 for (i = 0; i < friendsIds.length; i++) {
-                  getQueryResults(friendsIds[i], function(err, result){
+                  getUserDetails(friendsIds[i], function(err, result){
                     if (result) {
-                      resultCount ++;
+                      resultsCount ++;
                       results.push(result);
-                      if (resultCount == friendsIds.length) {
+                      if (resultsCount == friendsIds.length) {
                         res.json({friends: results});
                       }
                     }
                   });
                 };
-              } else {
-                  res.json({friends: []});
               }
+
             };
           })
         }
@@ -138,10 +139,10 @@ app.get('/friends/:userId', function(req, res, next) {
   );
 })
 
-function getQueryResults (id, callback) {
+function getUserDetails(id, callback) {
   const query8 = client.query(
-      `SELECT id, first_name, last_name FROM account WHERE id = $1::int`,[parseInt(id)],
-       function(err, result) {
+    `SELECT id, first_name, last_name FROM account WHERE id = $1::int`,[parseInt(id)],
+     function(err, result) {
       if (err) throw err;
       if (result) {
         callback(null, result.rows[0]);

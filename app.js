@@ -85,6 +85,9 @@ query6.on('error', function(error) {
   // console.log(error);
 });
 
+app.get('/', function(req, res) {
+  res.send('OK');
+});
 
 app.get('/friends/:userId', function(req, res, next) {
 

@@ -157,8 +157,8 @@ app.use(function(err, req, res, next) {
     return next();
   }
 
-res.status(404);
- res.send(err.message || 'ERROR 404');
+  res.status(404);
+  res.send(err.message || 'ERROR 404');
 });
 
 app.listen(3000)

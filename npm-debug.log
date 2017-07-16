@@ -1,35 +1,35 @@
 0 info it worked if it ends with ok
-1 verbose cli [ 'C:\\Program Files\\nodejs\\node.exe',
-1 verbose cli   'C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli [ '/Users/mmoh/.nvm/versions/node/v7.5.0/bin/node',
+1 verbose cli   '/Users/mmoh/.nvm/versions/node/v7.5.0/bin/npm',
 1 verbose cli   'start' ]
-2 info using npm@3.10.10
-3 info using node@v6.11.0
+2 info using npm@4.1.2
+3 info using node@v7.5.0
 4 verbose run-script [ 'prestart', 'start', 'poststart' ]
 5 info lifecycle q@1.0.0~prestart: q@1.0.0
 6 silly lifecycle q@1.0.0~prestart: no script for prestart, continuing
 7 info lifecycle q@1.0.0~start: q@1.0.0
 8 verbose lifecycle q@1.0.0~start: unsafe-perm in lifecycle true
-9 verbose lifecycle q@1.0.0~start: PATH: C:\Program Files\nodejs\node_modules\npm\bin\node-gyp-bin;C:\Users\Monireh\Documents\projects\freetimeback\node_modules\.bin;C:\Users\Monireh\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\local\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\Monireh\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\system32\config\systemprofile\.dnx\bin;C:\Program Files\Microsoft DNX\Dnvm;C:\Program Files\Microsoft SQL Server\130\Tools\Binn;C:\Program Files\nodejs;C:\Users\Monireh\AppData\Local\Microsoft\WindowsApps;C:\Program Files\Heroku\bin;C:\Users\Monireh\AppData\Roaming\npm;C:\Program Files\Git\usr\bin\vendor_perl;C:\Program Files\Git\usr\bin\core_perl
-10 verbose lifecycle q@1.0.0~start: CWD: C:\Users\Monireh\Documents\projects\freetimeback
-11 silly lifecycle q@1.0.0~start: Args: [ '/d /s /c', 'node app.js' ]
+9 verbose lifecycle q@1.0.0~start: PATH: /Users/mmoh/.nvm/versions/node/v7.5.0/lib/node_modules/npm/bin/node-gyp-bin:/Users/mmoh/Projects/freetimeback/node_modules/.bin:/Users/mmoh/.nvm/versions/node/v7.5.0/bin:/usr/local/bin:/usr/local/lib:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/mmoh/Library/Android/sdk/tools:/Users/mmoh/Library/Android/sdk/platform-tools
+10 verbose lifecycle q@1.0.0~start: CWD: /Users/mmoh/Projects/freetimeback
+11 silly lifecycle q@1.0.0~start: Args: [ '-c', 'node app.js' ]
 12 silly lifecycle q@1.0.0~start: Returned: code: 1  signal: null
 13 info lifecycle q@1.0.0~start: Failed to exec start script
 14 verbose stack Error: q@1.0.0 start: `node app.js`
 14 verbose stack Exit status 1
-14 verbose stack     at EventEmitter.<anonymous> (C:\Program Files\nodejs\node_modules\npm\lib\utils\lifecycle.js:255:16)
+14 verbose stack     at EventEmitter.<anonymous> (/Users/mmoh/.nvm/versions/node/v7.5.0/lib/node_modules/npm/lib/utils/lifecycle.js:279:16)
 14 verbose stack     at emitTwo (events.js:106:13)
-14 verbose stack     at EventEmitter.emit (events.js:191:7)
-14 verbose stack     at ChildProcess.<anonymous> (C:\Program Files\nodejs\node_modules\npm\lib\utils\spawn.js:40:14)
+14 verbose stack     at EventEmitter.emit (events.js:192:7)
+14 verbose stack     at ChildProcess.<anonymous> (/Users/mmoh/.nvm/versions/node/v7.5.0/lib/node_modules/npm/lib/utils/spawn.js:40:14)
 14 verbose stack     at emitTwo (events.js:106:13)
-14 verbose stack     at ChildProcess.emit (events.js:191:7)
-14 verbose stack     at maybeClose (internal/child_process.js:891:16)
+14 verbose stack     at ChildProcess.emit (events.js:192:7)
+14 verbose stack     at maybeClose (internal/child_process.js:890:16)
 14 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:226:5)
 15 verbose pkgid q@1.0.0
-16 verbose cwd C:\Users\Monireh\Documents\projects\freetimeback
-17 error Windows_NT 10.0.14393
-18 error argv "C:\\Program Files\\nodejs\\node.exe" "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "start"
-19 error node v6.11.0
-20 error npm  v3.10.10
+16 verbose cwd /Users/mmoh/Projects/freetimeback
+17 error Darwin 16.6.0
+18 error argv "/Users/mmoh/.nvm/versions/node/v7.5.0/bin/node" "/Users/mmoh/.nvm/versions/node/v7.5.0/bin/npm" "start"
+19 error node v7.5.0
+20 error npm  v4.1.2
 21 error code ELIFECYCLE
 22 error q@1.0.0 start: `node app.js`
 22 error Exit status 1

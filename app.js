@@ -6,12 +6,42 @@ var url = require('url')
 
 const pg = require('pg');
 
+//var admin = require("firebase-admin");
+
+//var serviceAccount = require("path/to///serviceAccountKey.json");
+
+//admin.initializeApp({
+//  credential: admin.credential.cert(serviceAccount),
+//  databaseURL: "https://<DATABASE_NAME>.firebaseio.com"
+//});
+
+//admin.initializeApp({
+//  credential: admin.credential.applicationDefault(),
+//  databaseURL: "https://<DATABASE_NAME>.firebaseio.com"
+//});
+
 const connectionString = process.env.DATABASE_URL || 'postgres://freetime:freetime@localhost:5432/freetime';
 
 const client = new pg.Client(connectionString);
 
 
 client.connect();
+
+// Testing authentication
+//var GoogleAuth = require('google-auth-library');
+//var auth = new GoogleAuth;
+//var client = new auth.OAuth2(CLIENT_ID, '', '');
+//client.verifyIdToken(
+  //  token,
+    //CLIENT_ID,
+    // Or, if multiple clients access the backend:
+    //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3],
+    //function(e, login) {
+      //var payload = login.getPayload();
+      //var userid = payload['sub'];
+      // If request specified a G Suite domain:
+      //var domain = payload['hd'];
+    //});
 
 const query = client.query(
   `CREATE TABLE IF NOT EXISTS "account" (
@@ -84,6 +114,10 @@ query5.on('error', function(error) {
 query6.on('error', function(error) {
   // console.log(error);
 });
+
+app.post('/auth/', function(req, res) {
+  res.sendStatus(200);
+})
 
 
 app.get('/friends/:userId', function(req, res, next) {

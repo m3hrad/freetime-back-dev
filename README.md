@@ -18,7 +18,7 @@
 
 ## Windows
 
-###pgAdmin4
+### pgAdmin4
 
 - Install windows installer from https://www.postgresql.org/download/windows/
 - User added in Login/Group roles
@@ -27,7 +27,7 @@
 - new server created:
 - name: localhost
 
-###PSQL:
+### PSQL:
 
  - install PSQL, set the password: 123456
  - In command propmt type: psql -U postgres postgres

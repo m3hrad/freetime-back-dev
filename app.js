@@ -87,6 +87,10 @@ app.get('/', function(req, res) {
   res.send('OK');
 });
 
+app.post('/auth/', function(req, res) {
+  res.sendStatus(200);
+})
+
 app.get('/friends/:userId', function(req, res, next) {
 
   //check if the id exist

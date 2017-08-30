@@ -77,7 +77,7 @@ query4.on('error', function(error) {
 });
 
 query5.on('error', function(error) {
-  // console.log(erro");
+  // console.log(error");
 });
 query6.on('error', function(error) {
   // console.log(error);
@@ -87,29 +87,29 @@ app.get('/', function(req, res) {
 });
 
 var bodyParser = require('body-parser');
-app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({
   extended: true
 }));
 
 var admin = require("firebase-admin");
-var serviceAccount = require("./serviceAccountKey1.json");
+var serviceAccount = require("./serviceAccountKey.json");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://free-time-c6774.firebaseio.com"
   });
 
 app.post('/auth/', function(req, res) {
-  console.log("The coonection is OK");
+  console.log("The connection is OK");
 admin.auth().verifyIdToken(req.body.token)
   .then(function(decodedToken) {
     var uid = decodedToken.uid;
+    res.sendStatus(200);
     console.log("The auth is ok");
   }).catch(function(error) {
-    console.log("Error");
     // Handle error
+    res.sendStatus(401);
+    console.log("Error");
   });
-  res.end();
 });
 
 app.get('/friends/:userId', function(req, res, next) {

@@ -35,5 +35,5 @@
  - type: CREATE DATABASE freetime;
  - type: Create user freetime PASSWORD 'freetime';
  - in pgAdmin4, connect database "freetime"
- - npm istall
+ - npm install
  - npm start

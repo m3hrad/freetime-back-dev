@@ -1,8 +1,8 @@
-var express = require('express')
+var express = require('express');
 
-var app = express()
+var app = express();
 
-var url = require('url')
+var url = require('url');
 
 const pg = require('pg');
 var port = process.env.PORT || 3000;
@@ -77,9 +77,8 @@ query4.on('error', function(error) {
 });
 
 query5.on('error', function(error) {
-  // console.log(error);
+  // console.log(error");
 });
-
 query6.on('error', function(error) {
   // console.log(error);
 });
@@ -87,12 +86,33 @@ app.get('/', function(req, res) {
   res.send('OK');
 });
 
+var bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+
+var admin = require("firebase-admin");
+var serviceAccount = require("./serviceAccountKey.json");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://free-time-c6774.firebaseio.com"
+  });
+
 app.post('/auth/', function(req, res) {
-  res.sendStatus(200);
-})
+  console.log("The connection is OK");
+admin.auth().verifyIdToken(req.body.token)
+  .then(function(decodedToken) {
+    var uid = decodedToken.uid;
+    res.sendStatus(200);
+    console.log("The auth is ok");
+  }).catch(function(error) {
+    // Handle error
+    res.sendStatus(401);
+    console.log("Error");
+  });
+});
 
 app.get('/friends/:userId', function(req, res, next) {
-
   //check if the id exist
   const query9 = client.query(`SELECT id FROM account where id = $1::int ;`
     ,[parseInt(req.params.userId)], function(err, result) {

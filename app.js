@@ -25,10 +25,11 @@ const query = client.query(
     "created_on" timestamp with time zone,
     "photo_url" text,
     "available" bool DEFAULT FALSE,
-    "token" text DEFAULT NULL,
+    "token" text,
     PRIMARY KEY ("id"),
     UNIQUE ("email"),
-    UNIQUE ("phone_number")
+    UNIQUE ("phone_number"),
+    UNIQUE ("token")
   );
 `);
 
@@ -44,18 +45,18 @@ const query1 = client.query(
 `);
 
 const query2 = client.query(
-  `INSERT INTO "account"("id", "first_name", "last_name", "email", "deleted", "phone_number")
-  VALUES(0, 'Mehrad', 'Mohammadi', 'm3hrad@gmail.com', FALSE, '0505977458');
+  `INSERT INTO "account"("id", "first_name", "last_name", "email", "deleted", "phone_number", "token")
+  VALUES(0, 'Mehrad', 'Mohammadi', 'm3hrad@gmail.com', FALSE, '0505977458', '1');
 `);
 
 const query3 = client.query(`
-  INSERT INTO "account"("id", "first_name", "last_name", "email", "deleted", "phone_number")
-  VALUES(1, 'Mahyar', 'Mohammadi', 'mahyar@gmail.com', FALSE, '0417543124');
+  INSERT INTO "account"("id", "first_name", "last_name", "email", "deleted", "phone_number", "token")
+  VALUES(1, 'Mahyar', 'Mohammadi', 'mahyar@gmail.com', FALSE, '0417543124', '2');
 `);
 
 const query4 = client.query(`
-  INSERT INTO "account"("id", "first_name", "last_name", "email", "deleted", "phone_number")
-  VALUES(2, 'Shima', 'Edalatkhah', 'shima@gmail.com', FALSE, '0449512964');
+  INSERT INTO "account"("id", "first_name", "last_name", "email", "deleted", "phone_number", "token")
+  VALUES(2, 'Shima', 'Edalatkhah', 'shima@gmail.com', FALSE, '0449512964', '3');
 `);
 
 const query5 = client.query(`
@@ -109,33 +110,35 @@ app.post('/auth/', function(req, res) {
   .then(function(decodedToken) {
 
     const query9 = client.query(
-      `SELECT id, first_name, last_name, email, available FROM account WHERE email = $1`,[email],
+      `UPDATE account SET token = $2 WHERE email = $1 RETURNING id,first_name,
+      last_name, email, available`,[email, token],
         function(err, result) {
           if (err) {
             console.log(err);
           }
           if (result) {
-            if (typeof result.rows[0] == 'undefined') {
+            console.log('result');
+            console.log(result);
+            if (result.rowCount == 0) {
+              console.log('row count = 0');
                 //create a new user
-                const query10 = client.query(
+                const query100 = client.query(
                   `INSERT INTO account (id,first_name,last_name, email, password_hash,
                      deleted, phone_number, birthdate, created_on, photo_url, available, token)
                      VALUES (DEFAULT, NULL, NUll, $1, NULL, FALSE, NULL, NULL, NULL, NULL, FALSE, $2)
                      RETURNING id,first_name, last_name, email, available`,[email, token],
                     function(err, result) {
                       if (err) {
-                        console.log(err);
+                        console.log('duplicate token');
+                        res.sendStatus(400);
                       }
                       if (result) {
-                        console.log('user created:');
-                        console.log(result.rows[0]);
                         res.send({user: result.rows[0]});
                       }
                     }
                   )
             } else {
               //return the existing customers' info
-              console.log(result.rows[0]);
               res.json({user: result.rows[0]});
             }
           }

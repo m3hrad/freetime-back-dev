@@ -14,7 +14,7 @@ client.connect();
 
 const query = client.query(
   `CREATE TABLE IF NOT EXISTS "account" (
-    "id" serial ,
+    "id" serial,
     "first_name" text,
     "last_name" text,
     "email" text,
@@ -102,10 +102,47 @@ admin.initializeApp({
 
 app.post('/auth/', function(req, res) {
   console.log("The connection is OK");
+  var token = req.get('Authorization');
+  var email = req.body.email;
+
   admin.auth().verifyIdToken(req.get('Authorization'))
   .then(function(decodedToken) {
+
+    const query9 = client.query(
+      `SELECT id, first_name, last_name, email, available FROM account WHERE email = $1`,[email],
+        function(err, result) {
+          if (err) {
+            console.log(err);
+          }
+          if (result) {
+            if (typeof result.rows[0] == 'undefined') {
+                //create a new user
+                const query10 = client.query(
+                  `INSERT INTO account (id,first_name,last_name, email, password_hash,
+                     deleted, phone_number, birthdate, created_on, photo_url, available, token)
+                     VALUES (DEFAULT, NULL, NUll, $1, NULL, FALSE, NULL, NULL, NULL, NULL, FALSE, $2)
+                     RETURNING id,first_name, last_name, email, available`,[email, token],
+                    function(err, result) {
+                      if (err) {
+                        console.log(err);
+                      }
+                      if (result) {
+                        console.log('user created:');
+                        console.log(result.rows[0]);
+                        res.send({user: result.rows[0]});
+                      }
+                    }
+                  )
+            } else {
+              //return the existing customers' info
+              console.log(result.rows[0]);
+              res.json({user: result.rows[0]});
+            }
+          }
+        }
+    );
+
     var uid = decodedToken.uid;
-    res.sendStatus(200);
     console.log("The auth is ok");
   }).catch(function(error) {
     // Handle error
@@ -113,6 +150,10 @@ app.post('/auth/', function(req, res) {
     console.log("Error");
   });
 });
+
+function emailExists(email){
+  console.log('email received');
+};
 
 app.get('/friends/:userId', function(req, res, next) {
   //check if the id exist
@@ -134,7 +175,6 @@ app.get('/friends/:userId', function(req, res, next) {
           const query7 = client.query(
             `SELECT array_agg(friend_id) FROM friend WHERE user_id = $1::int group by user_id;`
             ,[parseInt(req.params.userId)], function(err, result) {
-
             if (err) {
               throw err;
             }

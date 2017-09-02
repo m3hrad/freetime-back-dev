@@ -102,7 +102,7 @@ admin.initializeApp({
 
 app.post('/auth/', function(req, res) {
   console.log("The connection is OK");
-admin.auth().verifyIdToken(req.body.token)
+  admin.auth().verifyIdToken(req.get('Authorization'))
   .then(function(decodedToken) {
     var uid = decodedToken.uid;
     res.sendStatus(200);

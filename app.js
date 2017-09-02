@@ -129,7 +129,8 @@ app.post('/auth/', function(req, res) {
                      RETURNING id,first_name, last_name, email, available`,[email, token],
                     function(err, result) {
                       if (err) {
-                        console.log('duplicate token');
+                        console.log('duplicate token:');
+                        console.log(err);
                         res.sendStatus(400);
                       }
                       if (result) {

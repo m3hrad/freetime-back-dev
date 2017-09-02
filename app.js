@@ -151,10 +151,6 @@ app.post('/auth/', function(req, res) {
   });
 });
 
-function emailExists(email){
-  console.log('email received');
-};
-
 app.get('/friends/:userId', function(req, res, next) {
   //check if the id exist
   const query9 = client.query(`SELECT id FROM account where id = $1::int ;`

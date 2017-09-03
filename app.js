@@ -1,8 +1,8 @@
-var express = require('express')
+var express = require('express');
 
-var app = express()
+var app = express();
 
-var url = require('url')
+var url = require('url');
 
 const pg = require('pg');
 var port = process.env.PORT || 3000;
@@ -14,7 +14,7 @@ client.connect();
 
 const query = client.query(
   `CREATE TABLE IF NOT EXISTS "account" (
-    "id" serial ,
+    "id" serial,
     "first_name" text,
     "last_name" text,
     "email" text,
@@ -24,9 +24,12 @@ const query = client.query(
     "birthdate" date,
     "created_on" timestamp with time zone,
     "photo_url" text,
+    "available" bool DEFAULT FALSE,
+    "token" text,
     PRIMARY KEY ("id"),
     UNIQUE ("email"),
-    UNIQUE ("phone_number")
+    UNIQUE ("phone_number"),
+    UNIQUE ("token")
   );
 `);
 
@@ -42,18 +45,18 @@ const query1 = client.query(
 `);
 
 const query2 = client.query(
-  `INSERT INTO "account"("id", "first_name", "last_name", "email", "deleted", "phone_number")
-  VALUES(0, 'Mehrad', 'Mohammadi', 'm3hrad@gmail.com', FALSE, '0505977458');
+  `INSERT INTO "account"("id", "first_name", "last_name", "email", "deleted", "phone_number", "token")
+  VALUES(0, 'Mehrad', 'Mohammadi', 'm3hrad@gmail.com', FALSE, '0505977458', '1');
 `);
 
 const query3 = client.query(`
-  INSERT INTO "account"("id", "first_name", "last_name", "email", "deleted", "phone_number")
-  VALUES(1, 'Mahyar', 'Mohammadi', 'mahyar@gmail.com', FALSE, '0417543124');
+  INSERT INTO "account"("id", "first_name", "last_name", "email", "deleted", "phone_number", "token")
+  VALUES(1, 'Mahyar', 'Mohammadi', 'mahyar@gmail.com', FALSE, '0417543124', '2');
 `);
 
 const query4 = client.query(`
-  INSERT INTO "account"("id", "first_name", "last_name", "email", "deleted", "phone_number")
-  VALUES(2, 'Shima', 'Edalatkhah', 'shima@gmail.com', FALSE, '0449512964');
+  INSERT INTO "account"("id", "first_name", "last_name", "email", "deleted", "phone_number", "token")
+  VALUES(2, 'Shima', 'Edalatkhah', 'shima@gmail.com', FALSE, '0449512964', '3');
 `);
 
 const query5 = client.query(`
@@ -77,9 +80,8 @@ query4.on('error', function(error) {
 });
 
 query5.on('error', function(error) {
-  // console.log(error);
+  // console.log(error");
 });
-
 query6.on('error', function(error) {
   // console.log(error);
 });
@@ -87,8 +89,73 @@ app.get('/', function(req, res) {
   res.send('OK');
 });
 
-app.get('/friends/:userId', function(req, res, next) {
+var bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
+var admin = require("firebase-admin");
+var serviceAccount = require("./serviceAccountKey.json");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://free-time-c6774.firebaseio.com"
+  });
+
+app.post('/auth/', function(req, res) {
+  console.log("The connection is OK");
+  var token = req.get('Authorization');
+  var email = req.body.email;
+
+  admin.auth().verifyIdToken(req.get('Authorization'))
+  .then(function(decodedToken) {
+
+    const query9 = client.query(
+      `UPDATE account SET token = $2 WHERE email = $1 RETURNING id,first_name,
+      last_name, email, available`,[email, token],
+        function(err, result) {
+          if (err) {
+            console.log(err);
+          }
+          if (result) {
+            console.log('result');
+            console.log(result);
+            if (result.rowCount == 0) {
+              console.log('row count = 0');
+                //create a new user
+                const query100 = client.query(
+                  `INSERT INTO account (id,first_name,last_name, email, password_hash,
+                     deleted, phone_number, birthdate, created_on, photo_url, available, token)
+                     VALUES (DEFAULT, NULL, NUll, $1, NULL, FALSE, NULL, NULL, NULL, NULL, FALSE, $2)
+                     RETURNING id,first_name, last_name, email, available`,[email, token],
+                    function(err, result) {
+                      if (err) {
+                        console.log('duplicate token:');
+                        console.log(err);
+                        res.sendStatus(400);
+                      }
+                      if (result) {
+                        res.send({user: result.rows[0]});
+                      }
+                    }
+                  )
+            } else {
+              //return the existing customers' info
+              res.json({user: result.rows[0]});
+            }
+          }
+        }
+    );
+
+    var uid = decodedToken.uid;
+    console.log("The auth is ok");
+  }).catch(function(error) {
+    // Handle error
+    res.sendStatus(401);
+    console.log("Error");
+  });
+});
+
+app.get('/user/:userId/friends', function(req, res, next) {
   //check if the id exist
   const query9 = client.query(`SELECT id FROM account where id = $1::int ;`
     ,[parseInt(req.params.userId)], function(err, result) {
@@ -108,7 +175,6 @@ app.get('/friends/:userId', function(req, res, next) {
           const query7 = client.query(
             `SELECT array_agg(friend_id) FROM friend WHERE user_id = $1::int group by user_id;`
             ,[parseInt(req.params.userId)], function(err, result) {
-
             if (err) {
               throw err;
             }
@@ -118,7 +184,7 @@ app.get('/friends/:userId', function(req, res, next) {
                 var results = [];
                 var resultCount = 0;
                 for (i = 0; i < friendsIds.length; i++) {
-                  getQueryResults(friendsIds[i], function(err, result){
+                  getUserInfo(friendsIds[i], function(err, result){
                     if (result) {
                       resultCount ++;
                       results.push(result);
@@ -139,9 +205,9 @@ app.get('/friends/:userId', function(req, res, next) {
   );
 })
 
-function getQueryResults (id, callback) {
+function getUserInfo(id, callback) {
   const query8 = client.query(
-      `SELECT id, first_name, last_name FROM account WHERE id = $1::int`,[parseInt(id)],
+      `SELECT id, email, first_name, last_name, available FROM account WHERE id = $1::int`,[parseInt(id)],
        function(err, result) {
       if (err) throw err;
       if (result) {

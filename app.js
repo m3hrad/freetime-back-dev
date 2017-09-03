@@ -153,17 +153,6 @@ app.post('/auth/', function(req, res) {
   });
 });
 
-function validateToken (token, callback) {
-  admin.auth().verifyIdToken(token)
-  .then(function(decodedToken) {
-    return true;
-  }).catch(function(error) {
-    // Handle error
-    return false;
-    console.log("Error");
-  });
-}
-
 function getUserByToken(token, callback) {
   const query = client.query(
     `SELECT * FROM account WHERE token = $1`,[token],

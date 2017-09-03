@@ -155,7 +155,7 @@ app.post('/auth/', function(req, res) {
   });
 });
 
-app.get('/user/:userId/friends', function(req, res, next) {
+app.get('/friends/:userId', function(req, res, next) {
   //check if the id exist
   const query9 = client.query(`SELECT id FROM account where id = $1::int ;`
     ,[parseInt(req.params.userId)], function(err, result) {
@@ -184,7 +184,7 @@ app.get('/user/:userId/friends', function(req, res, next) {
                 var results = [];
                 var resultCount = 0;
                 for (i = 0; i < friendsIds.length; i++) {
-                  getUserInfo(friendsIds[i], function(err, result){
+                  getQueryResults(friendsIds[i], function(err, result){
                     if (result) {
                       resultCount ++;
                       results.push(result);
@@ -205,9 +205,31 @@ app.get('/user/:userId/friends', function(req, res, next) {
   );
 })
 
-function getUserInfo(id, callback) {
+app.put('/user/:id', function(req, res, next) {
+  var available = req.body.available;
+  var id = req.params.id;
+
+  if (typeof req.body.available !== 'undefined' ) {
+    const query7 = client.query(
+      `UPDATE account SET available = $1 WHERE id = $2 RETURNING id,first_name,
+      last_name, email, available;`
+      ,[available, id], function(err, result) {
+      if (err) {
+        throw err;
+      }
+      if (result) {
+        res.send({user: result.rows[0]});
+      }
+    })
+  } else {
+    //update other parameters
+    res.sendStatus(405);
+  }
+})
+
+function getQueryResults (id, callback) {
   const query8 = client.query(
-      `SELECT id, email, first_name, last_name, available FROM account WHERE id = $1::int`,[parseInt(id)],
+      `SELECT id, first_name, last_name FROM account WHERE id = $1::int`,[parseInt(id)],
        function(err, result) {
       if (err) throw err;
       if (result) {

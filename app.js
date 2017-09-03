@@ -117,8 +117,6 @@ app.post('/auth/', function(req, res) {
             console.log(err);
           }
           if (result) {
-            console.log('result');
-            console.log(result);
             if (result.rowCount == 0) {
               console.log('row count = 0');
                 //create a new user
@@ -203,6 +201,28 @@ app.get('/user/:userId/friends', function(req, res, next) {
       }
     }
   );
+})
+
+app.put('/user/:id', function(req, res, next) {
+  var available = req.body.available;
+  var id = req.params.id;
+
+  if (typeof req.body.available !== 'undefined' ) {
+    const query7 = client.query(
+      `UPDATE account SET available = $1 WHERE id = $2 RETURNING id,first_name,
+      last_name, email, available;`
+      ,[available, id], function(err, result) {
+      if (err) {
+        throw err;
+      }
+      if (result) {
+        res.send({user: result.rows[0]});
+      }
+    })
+  } else {
+    //update other parameters
+    res.sendStatus(405);
+  }
 })
 
 function getUserInfo(id, callback) {

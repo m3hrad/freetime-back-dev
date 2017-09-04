@@ -132,13 +132,13 @@ app.post('/auth/', function(req, res) {
                         res.sendStatus(400);
                       }
                       if (result) {
-                        res.send({user: result.rows[0]});
+                        res.send(result.rows[0]);
                       }
                     }
                   )
             } else {
               //return the existing customers' info
-              res.json({user: result.rows[0]});
+              res.json(result.rows[0]);
             }
           }
         }

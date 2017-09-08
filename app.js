@@ -140,7 +140,7 @@ app.post('/auth/', function(req, res) {
                   )
             } else {
               //return the existing customers' info
-              res.json(user: result.rows[0]);
+              res.send(result.rows[0]);
             }
           }
         }

@@ -24,7 +24,7 @@ const query = client.query(
     "birthdate" date,
     "created_on" timestamp with time zone,
     "photo_url" text,
-    "available" bool DEFAULT FALSE,
+    "available" text DEFAULT FALSE,
     "token" text,
     PRIMARY KEY ("id"),
     UNIQUE ("email"),

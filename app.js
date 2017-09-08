@@ -24,7 +24,7 @@ const query = client.query(
     "birthdate" date,
     "created_on" timestamp with time zone,
     "photo_url" text,
-    "available" text DEFAULT FALSE,
+    "available" text DEFAULT "FALSE",
     "token" text,
     PRIMARY KEY ("id"),
     UNIQUE ("email"),
@@ -123,7 +123,7 @@ app.post('/auth/', function(req, res) {
                 const query100 = client.query(
                   `INSERT INTO account (id,first_name,last_name, email, password_hash,
                      deleted, phone_number, birthdate, created_on, photo_url, available, token)
-                     VALUES (DEFAULT, NULL, NUll, $1, NULL, FALSE, NULL, NULL, NULL, NULL, FALSE, $2)
+                     VALUES (DEFAULT, NULL, NUll, $1, NULL, FALSE, NULL, NULL, NULL, NULL, "FALSE", $2)
                      RETURNING id,first_name, last_name, email, available`,[email, token],
                     function(err, result) {
                       if (err) {

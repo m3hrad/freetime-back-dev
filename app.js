@@ -274,8 +274,9 @@ app.put('/user/:id', function(req, res, next) {
                 res.sendStatus(500);
               }
               if (result) {
-                res.json({user: result.rows[0]});
+                res.send(result.rows[0]);
                 // res.send(result.rows[0]);
+               // res.send(result.rows[0]);                
               }
             })
           } else {

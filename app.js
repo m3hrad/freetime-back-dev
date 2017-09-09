@@ -117,6 +117,8 @@ app.post('/auth/', function(req, res) {
             console.log(err);
           }
           if (result) {
+            console.log('result');
+            console.log(result);
             if (result.rowCount == 0) {
               console.log('row count = 0');
                 //create a new user
@@ -132,7 +134,7 @@ app.post('/auth/', function(req, res) {
                         res.sendStatus(400);
                       }
                       if (result) {
-                        res.send(result.rows[0]);
+                        res.json(result.rows[0]);
                       }
                     }
                   )
@@ -216,7 +218,7 @@ app.put('/user/:id', function(req, res, next) {
         throw err;
       }
       if (result) {
-        res.send(result.rows[0]);
+        res.json(result.rows[0]);
       }
     })
   } else {

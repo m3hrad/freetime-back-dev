@@ -132,13 +132,13 @@ app.post('/auth/', function(req, res) {
                         res.sendStatus(400);
                       }
                       if (result) {
-                        res.send({user: result.rows[0]});
+                        res.send(result.rows[0]);
                       }
                     }
                   )
             } else {
               //return the existing customers' info
-              res.json({user: result.rows[0]});
+              res.json(result.rows[0]);
             }
           }
         }
@@ -153,143 +153,76 @@ app.post('/auth/', function(req, res) {
   });
 });
 
-function getUserByToken(token, callback) {
-  const query = client.query(
-    `SELECT * FROM account WHERE token = $1`,[token],
-     function(err, result) {
-      if (err) {
-        callback(err, null);
-      }
-      if (result) {
-        callback(null, result.rows[0]);
-      }
-    }
-  );
-}
-
 app.get('/user/:userId/friends', function(req, res, next) {
-  if (typeof req.get('Authorization') == 'undefined') {
-    res.sendStatus(401);
-    res.end();
-  }
-  admin.auth().verifyIdToken(req.get('Authorization'))
-  .then(function(decodedToken) {
-    //verify the token
-    getUserByToken(req.get('Authorization'), function(err, result){
-      if(err) {
+  //check if the id exist
+  const query9 = client.query(`SELECT id FROM account where id = $1::int ;`
+    ,[parseInt(req.params.userId)], function(err, result) {
+      if (err) {
         console.log(err);
       }
       if (result) {
-        if (result.id == req.params.userId) {
-          console.log('valid');
-              //check if the id exist
-              const query9 = client.query(`SELECT id FROM account where id = $1::int ;`
-                ,[parseInt(req.params.userId)], function(err, result) {
-                  if (err) {
-                    console.log(err);
-                  }
-                  if (result) {
-                    //if the id doesnt exists
-                    if (typeof result.rows[0] == 'undefined') {
-                      //error handling
-                      var err = new Error();
-                      err.status = 404;
-                      err.message = 'The ID does not exist.';
-                      next(err);
+        //if the id doesnt exists
+        if (typeof result.rows[0] == 'undefined') {
+          //error handling
+          var err = new Error();
+          err.status = 404;
+          err.message = 'The ID does not exist.';
+          next(err);
 
-                    } else {
-                      const query7 = client.query(
-                        `SELECT array_agg(friend_id) FROM friend WHERE user_id = $1::int group by user_id;`
-                        ,[parseInt(req.params.userId)], function(err, result) {
-                        if (err) {
-                          throw err;
-                        }
-                        if (result) {
-                          if (typeof result.rows[0] !== 'undefined' ) {
-                            var friendsIds = result.rows[0].array_agg;
-                            var results = [];
-                            var resultCount = 0;
-                            for (i = 0; i < friendsIds.length; i++) {
-                              getUserInfo(friendsIds[i], function(err, result){
-                                if (result) {
-                                  resultCount ++;
-                                  results.push(result);
-                                  if (resultCount == friendsIds.length) {
-                                    res.json({friends: results});
-                                  }
-                                }
-                              });
-                            };
-                          } else {
-                              res.json({friends: []});
-                          }
-                        };
-                      })
-                    }
-                  }
-                }
-              );
         } else {
-          res.send(401);
+          const query7 = client.query(
+            `SELECT array_agg(friend_id) FROM friend WHERE user_id = $1::int group by user_id;`
+            ,[parseInt(req.params.userId)], function(err, result) {
+            if (err) {
+              throw err;
+            }
+            if (result) {
+              if (typeof result.rows[0] !== 'undefined' ) {
+                var friendsIds = result.rows[0].array_agg;
+                var results = [];
+                var resultCount = 0;
+                for (i = 0; i < friendsIds.length; i++) {
+                  getUserInfo(friendsIds[i], function(err, result){
+                    if (result) {
+                      resultCount ++;
+                      results.push(result);
+                      if (resultCount == friendsIds.length) {
+                        res.json({friends: results});
+                      }
+                    }
+                  });
+                };
+              } else {
+                  res.json({friends: []});
+              }
+            };
+          })
         }
       }
-    });
-
-    }).catch(function(error) {
-      // Handle error
-      console.log("Error");
-      res.sendStatus(401);
-    });
+    }
+  );
 })
 
 app.put('/user/:id', function(req, res, next) {
   var available = req.body.available;
   var id = req.params.id;
 
-  if (typeof req.get('Authorization') == 'undefined') {
-    res.sendStatus(401);
-    res.end();
-  }
-
-  //verify request token
-  admin.auth().verifyIdToken(req.get('Authorization'))
-  .then(function(decodedToken) {
-
-    // check user ID from the token and compare it to the request ID
-    getUserByToken(req.get('Authorization'), function(err, result){
-      if(err) {
-        console.log(err);
-        res.sendStatus(500);
+  if (typeof req.body.available !== 'undefined' ) {
+    const query7 = client.query(
+      `UPDATE account SET available = $1 WHERE id = $2 RETURNING id,first_name,
+      last_name, email, available;`
+      ,[available, id], function(err, result) {
+      if (err) {
+        throw err;
       }
       if (result) {
-        if (result.id == id) {
-          //same id
-          //update available status
-          if (typeof req.body.available !== 'undefined' ) {
-            const query7 = client.query(
-              `UPDATE account SET available = $1 WHERE id = $2 RETURNING id,first_name,
-              last_name, email, available;`
-              ,[available, id], function(err, result) {
-              if (err) {
-                res.sendStatus(500);
-              }
-              if (result) {
-                res.send({user: result.rows[0]});
-              }
-            })
-          } else {
-            res.sendStatus(405);
-          }
-        } else {
-          res.sendStatus(401);
-        }
+        res.send(result.rows[0]);
       }
     })
-  }).catch(function(error) {
-    // Handle error
-    console.log("Error");
-    res.sendStatus(401);
-  });
+  } else {
+    //update other parameters
+    res.sendStatus(405);
+  }
 })
 
 function getUserInfo(id, callback) {
@@ -309,10 +242,11 @@ app.use(function(err, req, res, next) {
   if(err.status !== 404) {
     return next();
   }
-  res.status(404);
-  res.send(err.message || 'ERROR 404');
+
+res.status(404);
+ res.send(err.message || 'ERROR 404');
 });
 
 app.listen(port, function() {
-  console.log('Our app is running on http://localhost:' + port);
+    console.log('Our app is running on http://localhost:' + port);
 });

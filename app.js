@@ -161,7 +161,11 @@ function getUserByToken(token, callback) {
         callback(err, null);
       }
       if (result) {
-        callback(null, result.rows[0]);
+        if (typeof result.rows[0] == 'undefined') {
+          callback('Token does not exist', null);
+        } else {
+          callback(null, result.rows[0]);
+        }
       }
     }
   );
@@ -178,6 +182,7 @@ app.get('/user/:userId/friends', function(req, res, next) {
     getUserByToken(req.get('Authorization'), function(err, result){
       if(err) {
         console.log(err);
+        res.sendStatus(401);
       }
       if (result) {
         if (result.id == req.params.userId) {
@@ -242,6 +247,87 @@ app.get('/user/:userId/friends', function(req, res, next) {
     });
 })
 
+//add friend
+app.put('/user/:id/friends', function(req, res, next) {
+  var friendId = req.body.friendId;
+  var id = req.params.id;
+  var queryResults = [false, false];
+  var errored = false;
+
+  if (typeof req.get('Authorization') == 'undefined') {
+    res.sendStatus(401);
+    res.end();
+  }
+
+  admin.auth().verifyIdToken(req.get('Authorization'))
+  .then(function(decodedToken) {
+    getUserByToken(req.get('Authorization'), function(err, result){
+      if(err) {
+        console.log(err);
+        res.sendStatus(401);
+      }
+      if (result) {
+        if (result.id == req.params.id) {
+          if (typeof req.body.friendId !== 'undefined' ) {
+            const query1 = client.query(
+              `INSERT INTO friend (user_id, friend_id) VALUES ($1,$2);`
+              ,[id, friendId], function(err, result) {
+              if (err && !errored) {
+                console.log('error');
+                errored = true;
+                //ignore duplicate entry
+                if (err.code === '23505') {
+                    res.status(400);
+                    res.send('You are already friends.');
+                } else {
+                  res.sendStatus(400);
+                }
+              }
+              if (result) {
+                queryResults[0] = true;
+                if (queryResults[0] == true, queryResults[1] == true) {
+                  res.sendStatus(200);
+                  res.end();
+                }
+              }
+            })
+
+            const query2 = client.query(
+              `INSERT INTO friend (user_id, friend_id) VALUES ($1,$2);`
+              ,[friendId, id], function(err, result) {
+              if (err && !errored) {
+                console.log('error');
+                errored = true;
+                if (err.code === '23505') {
+                    res.status(400);
+                    res.send('You are already friends.');
+                } else {
+                  res.sendStatus(400);
+                }
+              }
+              if (result) {
+                queryResults[1] = true;
+                if (queryResults[0] == true, queryResults[1] == true) {
+                  res.sendStatus(200);
+                  res.end();
+                }
+              }
+            })
+
+          } else {
+            res.sendStatus(405);
+          }
+        }
+      }
+    })
+
+  }).catch(function(error) {
+    // Handle error
+    console.log("Error");
+    res.sendStatus(401);
+  });
+})
+
 app.put('/user/:id', function(req, res, next) {
   var available = req.body.available;
   var id = req.params.id;
@@ -259,7 +345,7 @@ app.put('/user/:id', function(req, res, next) {
     getUserByToken(req.get('Authorization'), function(err, result){
       if(err) {
         console.log(err);
-        res.sendStatus(500);
+        res.sendStatus(401);
       }
       if (result) {
         if (result.id == id) {
@@ -302,7 +388,7 @@ function getUserInfo(id, callback) {
       }
     }
   );
-}
+};
 
 // handling 404 errors
 app.use(function(err, req, res, next) {

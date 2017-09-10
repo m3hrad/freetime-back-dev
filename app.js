@@ -171,6 +171,38 @@ function getUserByToken(token, callback) {
   );
 }
 
+//search by email
+app.get('/user', function(req, res, next) {
+  var email = req.query.email;
+
+  if (typeof req.get('Authorization') == 'undefined') {
+    res.sendStatus(401);
+    res.end();
+  }
+  admin.auth().verifyIdToken(req.get('Authorization'))
+  .then(function(decodedToken) {
+    if (typeof email !== 'undefined' ) {
+      const query = client.query(
+        `SELECT id,email FROM account WHERE email LIKE '%' || $1 || '%';`
+        ,[email], function(err, result) {
+        if (err) {
+          res.sendStatus(500);
+        }
+        if (result) {
+          res.json(result.rows);
+        }
+      })
+    } else {
+      res.sendStatus(405);
+    }
+  }).catch(function(error) {
+    // Handle error
+    console.log("Error");
+    res.sendStatus(401);
+  });
+})
+
+
 app.get('/user/:userId/friends', function(req, res, next) {
   if (typeof req.get('Authorization') == 'undefined') {
     res.sendStatus(401);
@@ -378,6 +410,8 @@ app.put('/user/:id', function(req, res, next) {
   });
 })
 
+
+
 function getUserInfo(id, callback) {
   const query8 = client.query(
       `SELECT id, email, first_name, last_name, available FROM account WHERE id = $1::int`,[parseInt(id)],
@@ -389,6 +423,8 @@ function getUserInfo(id, callback) {
     }
   );
 };
+
+
 
 // handling 404 errors
 app.use(function(err, req, res, next) {

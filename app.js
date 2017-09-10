@@ -158,8 +158,6 @@ function getUserByToken(token, callback) {
     `SELECT * FROM account WHERE token = $1`,[token],
      function(err, result) {
       if (err) {
-        console.log('err');
-        console.log(err);
         callback(err, null);
       }
       if (result) {
@@ -168,10 +166,6 @@ function getUserByToken(token, callback) {
         } else {
           callback(null, result.rows[0]);
         }
-        // console.log('result');
-        // // console.log(result);
-        // console.log(result.rows[0]);
-
       }
     }
   );
@@ -226,7 +220,6 @@ app.get('/user/:userId/friends', function(req, res, next) {
                                   resultCount ++;
                                   results.push(result);
                                   if (resultCount == friendsIds.length) {
-                                    console.log(resultCount);
                                     res.json({friends: results});
                                   }
                                 }
@@ -385,11 +378,6 @@ app.put('/user/:id', function(req, res, next) {
   });
 })
 
-
-
-
-
-
 function getUserInfo(id, callback) {
   const query8 = client.query(
       `SELECT id, email, first_name, last_name, available FROM account WHERE id = $1::int`,[parseInt(id)],
@@ -401,11 +389,6 @@ function getUserInfo(id, callback) {
     }
   );
 };
-
-
-
-
-//add friend
 
 // handling 404 errors
 app.use(function(err, req, res, next) {

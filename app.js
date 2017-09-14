@@ -189,33 +189,7 @@ app.get('/user', function(req, res, next) {
           res.sendStatus(500);
         }
         if (result) {
-          // res.json(result.rows);
-          ///////////////////////////////////////////////////////////
-          if (typeof result.rows[0] !== 'undefined' ) {
-            var friendsIds = result.rows[0].array_agg;
-            var results = [];
-            var resultCount = 0;
-            for (i = 0; i < emailIds.length; i++) {
-              getUserInfo(friendsIds[i], function(err, result){
-                if (result) {
-                  resultCount ++;
-                  results.push(result);
-                  if (resultCount == friendsIds.length) {
-                    res.json({friends: results});
-                  }
-                }
-              });
-            };
-          } else {
-              res.json({friends: []});
-          }
-//         };
-//       })
-//     }
-//   }
-// }
-// );
-          ///////////////////////////////////////////////////////////
+          res.json(result.rows);
         }
       })
     } else {

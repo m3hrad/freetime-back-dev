@@ -192,22 +192,22 @@ app.get('/user', function(req, res, next) {
           // res.json(result.rows);
           ///////////////////////////////////////////////////////////
           if (typeof result.rows[0] !== 'undefined' ) {
-            var emailIds = result.rows[0].array_agg;
+            var friendsIds = result.rows[0].array_agg;
             var results = [];
             var resultCount = 0;
             for (i = 0; i < emailIds.length; i++) {
-              getUserInfo(emailIds[i], function(err, result){
+              getUserInfo(friendsIds[i], function(err, result){
                 if (result) {
                   resultCount ++;
                   results.push(result);
-                  if (resultCount == emailIds.length) {
-                    res.json({emails: results});
+                  if (resultCount == friendsIds.length) {
+                    res.json({friends: results});
                   }
                 }
               });
             };
           } else {
-              res.json({emails: []});
+              res.json({friends: []});
           }
 //         };
 //       })

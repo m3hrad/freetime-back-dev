@@ -189,7 +189,7 @@ app.get('/user', function(req, res, next) {
           res.sendStatus(500);
         }
         if (result) {
-          res.json(result.rows);
+          res.json({users: result.rows});
         }
       })
     } else {

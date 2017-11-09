@@ -360,6 +360,7 @@ app.put('/user/:id/friends', function(req, res, next) {
   });
 })
 
+//user status
 app.put('/user/:id', function(req, res, next) {
   var available = req.body.available;
   var id = req.params.id;
@@ -424,7 +425,61 @@ function getUserInfo(id, callback) {
   );
 };
 
+//update profile
+app.put('/user/profile/:id', function(req, res, next) {
+  var first_name = req.body.first_name;
+  var last_name = req.body.last_name;
+  var email = req.body.email;
+  var phone_number = req.body.phone_number;
+  var id = req.params.id;
 
+  if (typeof req.get('Authorization') == 'undefined') {
+    res.sendStatus(401);
+    res.end();
+  }
+
+  //verify request token
+  admin.auth().verifyIdToken(req.get('Authorization'))
+  .then(function(decodedToken) {
+
+    // check user ID from the token and compare it to the request ID
+    getUserByToken(req.get('Authorization'), function(err, result){
+      if(err) {
+        console.log(err);
+        res.sendStatus(401);
+      }
+      if (result) {
+        if (result.id == id) {
+          //same id
+          //update available status
+          if (typeof req.body.first_name !== 'undefined' || req.body.last_name !== 'undefined'
+              || req.body.email !== 'undefined' || req.body.phone_number !== 'undefined') {
+            const query12 = client.query(
+              `UPDATE account SET first_name = $1, last_name = $2, email = $3,
+              phone_number = $4 WHERE id = $5 RETURNING id,first_name,
+              last_name, email, phone_number;`
+              ,[first_name, last_name, email, phone_number, id], function(err, result) {
+              if (err) {
+                res.sendStatus(500);
+              }
+              if (result) {
+                res.json(result.rows[0]);
+              }
+            })
+          } else {
+            res.sendStatus(405);
+          }
+        } else {
+          res.sendStatus(401);
+        }
+      }
+    })
+  }).catch(function(error) {
+    // Handle error
+    console.log("Error");
+    res.sendStatus(401);
+  });
+})
 
 // handling 404 errors
 app.use(function(err, req, res, next) {

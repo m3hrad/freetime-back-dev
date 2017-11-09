@@ -6,7 +6,7 @@
 
 - Install postgres locally : brew install postgres
 - Create a cluster: initdb /usr/local/var/freetime_postgres
-- Run database(every time before running the server locally): postgres -D /usr/local/var/postgres
+- Run database(every time before running the server locally): postgres -D /usr/local/var/freetime_postgres
 - Login using the default user: psql postgres
 - Create database: CREATE DATABASE freetime;
 - Create user freetime PASSWORD 'freetime';

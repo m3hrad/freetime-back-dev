@@ -481,22 +481,6 @@ app.put('/user/profile/:id', function(req, res, next) {
   });
 })
 
-
-
-function getUserInfo(id, callback) {
-  const query11 = client.query(
-      `SELECT id, email, first_name, last_name, phone_number FROM account WHERE id = $1::int`,[parseInt(id)],
-       function(err, result) {
-      if (err) throw err;
-      if (result) {
-        callback(null, result.rows[0]);
-      }
-    }
-  );
-};
-
-
-
 // handling 404 errors
 app.use(function(err, req, res, next) {
   if(err.status !== 404) {
